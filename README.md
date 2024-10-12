@@ -14,9 +14,15 @@
 
 # Usage
 
-1. 进入 https://smms.app/，按照指引注册并登陆账号，点击右上角 `User` -> `Dashboard` -> `API Token` -> `Generate Secret Token`，然后复制你的 Secret Token
+1. 进入 https://smms.app/
+  
+   按照指引注册并登陆账号
 
-2. 将你想要的处理的 markdown 文件放在当前目录，输入：
+   点击右上角 `User` -> `Dashboard` -> `API Token` -> `Generate Secret Token`
+
+   复制你的 Secret Token
+
+4. 将你想要的处理的 markdown 文件放在当前目录，输入：
 
    ```bash
    $ python -m Markdown-Image-Upload your-markdown-file.md "your-Secret-Token"
