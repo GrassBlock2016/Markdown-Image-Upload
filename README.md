@@ -4,7 +4,9 @@
 
 写 markdown 的时候常常会随手贴一张本地图片，但在将 markdown 文件直接分享给他人时别人是看不见你本地的图片的。本项目旨在将你 markdown 中的本地图片一键替换为网络图片，这样所有人查看你的 markdown 文件时都不用再为此烦恼。
 
-本项目采用的图片托管网站为 https://smms.app/，参考了 https://doc.sm.ms/
+本项目采用的图片托管网站为 https://smms.app/
+
+参考 API 文档 https://doc.sm.ms/
 
 # Status
 
