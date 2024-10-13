@@ -27,5 +27,5 @@
 4. 将你想要的处理的 markdown 文件放在当前目录，输入：
 
    ```bash
-   $ python -m Markdown-Image-Upload your-markdown-file.md "your-Secret-Token"
+   $ python Markdown-Image-Upload.py your-markdown-file.md "your-Secret-Token"
    ```
