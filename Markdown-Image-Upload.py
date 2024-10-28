@@ -8,7 +8,7 @@ def get_local_img(markdown_file):
     with open(markdown_file, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    image_pattern = r'!\[.*?\]\((.*?)\)'
+    image_pattern = r'!\[.*?\]\((?!https?://)(.*?)\)'
     image_local_path = re.findall(image_pattern, content)
     # current_directory = os.getcwd()
 
