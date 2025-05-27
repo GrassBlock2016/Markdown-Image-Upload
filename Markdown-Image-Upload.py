@@ -2,9 +2,13 @@ import re
 import sys
 import requests
 import time
+import os
 from requests.exceptions import SSLError
 
 def get_local_img(markdown_file):
+    """
+    正则匹配Markdown文件中的本地图片路径
+    """
     with open(markdown_file, 'r', encoding='utf-8') as f:
         content = f.read()
 
@@ -13,6 +17,13 @@ def get_local_img(markdown_file):
     return image_local_path
 
 def get_network_img(image_local, token, max_retries=3):
+    """
+    上传本地图片到SM.MS并获取网络图片地址
+    """
+    if not os.path.isfile(image_local):
+        print(f"图片不存在: {image_local}")
+        return None
+    
     upload_url = 'https://smms.app/api/v2/upload'
     headers = {
         'Authorization': token
@@ -47,40 +58,65 @@ def get_network_img(image_local, token, max_retries=3):
                 return None
 
 def replace_single_img(markdown_file, img_local_path, img_network_path):
+    """
+    替换Markdown文件中的单个图片路径
+    """
     with open(markdown_file, 'r', encoding='utf-8') as f:
         content = f.read()
 
     content = content.replace(img_local_path, img_network_path)
-    print(f"已将图片 {img_local_path} 替换为 {img_network_path}")
+    print(f"\n已将图片 {img_local_path} 替换为 {img_network_path}")
 
     with open(markdown_file, 'w', encoding='utf-8') as f:
         f.write(content)
 
+def print_progress_bar(processed, total, width=50):
+    """
+    打印进度条
+    """
+    percent = processed / total
+    bar_length = int(width * percent)
+    bar = '■' * bar_length + '□' * (width - bar_length)
+    progress_text = f"\r进度: [{bar}] {processed}/{total} 图片 ({percent:.1%})"
+    
+    # 清除当前行并打印进度条
+    print(progress_text, end='', flush=True)
+
 def process_images(markdown_file, authorization, upload_limit_per_minute=20):
     img_local_paths = get_local_img(markdown_file)
+    total_images = len(img_local_paths)
+    processed_images = 0
     upload_count = 0
     start_time = time.time()
 
+    print_progress_bar(processed_images, total_images)
+
     for img_local_path in img_local_paths:
-        # 上传图片获取网络链接
         img_network_path = get_network_img(img_local_path, authorization)
         
         if img_network_path:
-            # 立即替换当前图片
             replace_single_img(markdown_file, img_local_path, img_network_path)
             upload_count += 1
+            processed_images += 1
+
+            print_progress_bar(processed_images, total_images)
 
             # 处理上传限制
             if upload_count >= upload_limit_per_minute:
                 elapsed_time = time.time() - start_time
                 if elapsed_time < 65:
                     wait_time = 65 - elapsed_time
-                    print(f"达到每分钟上传限制，等待 {wait_time:.2f} 秒...")
+                    print(f"\n达到每分钟上传限制，等待 {wait_time:.2f} 秒...")
                     time.sleep(wait_time)
+                    print_progress_bar(processed_images, total_images)
                 upload_count = 0
                 start_time = time.time()
         else:
-            print(f"跳过图片 {img_local_path} 的处理")
+            print(f"\n跳过图片 {img_local_path} 的处理")
+            processed_images += 1
+            print_progress_bar(processed_images, total_images)
+
+    print("\n所有图片均已处理完成。")
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
@@ -91,4 +127,3 @@ if __name__ == '__main__':
     authorization = sys.argv[2]
 
     process_images(markdown_file, authorization)
-    print("所有图片均已处理完成。")
